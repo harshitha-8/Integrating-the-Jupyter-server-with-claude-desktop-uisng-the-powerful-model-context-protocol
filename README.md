@@ -31,20 +31,17 @@ pip install jupyterlab==4.4.1 jupyter-collaboration==4.0.2 ipykernel
 pip uninstall -y pycrdt datalayer_pycrdt
 pip install datalayer_pycrdt==0.12.15
 
+-----
+## Starting JupyterLab
 
-Starting JupyterLab
-bash
-Copy
-Edit
-
+```bash
 jupyter lab --port 8888 --IdentityProvider.token MY_TOKEN --ip 0.0.0.0
 
-Alternatively, use:
 
-bash
-Copy
-Edit
+Alternatively, use:
+```bash
 make jupyterlab
+
 The --ip 0.0.0.0 option allows the MCP server running in Docker to access your local JupyterLab.
 
 
@@ -69,10 +66,8 @@ Configuration (macOS/Windows)
   }
 }
 
+
 Configuration (Linux)
-json
-Copy
-Edit
 {
   "mcpServers": {
     "jupyter": {
@@ -90,29 +85,30 @@ Edit
   }
 }
 
+
 Ensure the SERVER_URL and TOKEN match those used when starting JupyterLab. The NOTEBOOK_PATH should be relative to the directory where JupyterLab was started.
 
 Tools
 The server currently provides two main tools:
 
-Tool	Description	Input Parameter	Output
-add_execute_code_cell	Add and execute a code cell in a notebook	cell_content (str)	Cell output
-add_markdown_cell	Add a markdown cell in a notebook	cell_content (str)	Success message
+| Tool                    | Description                               | Input Parameter      | Output          |
+| ----------------------- | ----------------------------------------- | -------------------- | --------------- |
+| `add_execute_code_cell` | Add and execute a code cell in a notebook | `cell_content` (str) | Cell output     |
+| `add_markdown_cell`     | Add a markdown cell in a notebook         | `cell_content` (str) | Success message |
+
 
 Building the Docker Image
 To build the Docker image from source:
 
-bash
-Copy
-Edit
+```bash
 make build-docker
+
 Installation via Smithery
 To install Jupyter MCP Server for Claude Desktop automatically:
 
-bash
-Copy
-Edit
+```bash
 npx -y @smithery/cli install @datalayer/jupyter-mcp-server --client claude
+
 License
 See the repository for license details.
 
