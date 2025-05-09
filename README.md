@@ -1,59 +1,55 @@
 # Integrating-the-Jupyter-server-with-claude-desktop-uisng-the-powerful-model-context-protocol
 Jupyter MCP Server Jupyter MCP Server is an implementation of the Model Context Protocol (MCP) server that enables interaction with Jupyter notebooks running in any JupyterLab environment, including your local JupyterLab instance
 
-Features
+Start JupyterLab
+Make sure you have the following installed. The collaboration package is needed as the modifications made on the notebook can be seen thanks to Jupyter Real Time Collaboration.
 
-Provides an MCP server interface for Jupyter notebooks.
-
-Supports real-time collaboration using JupyterLab's collaboration features.
-
-Integrates with Claude Desktop (macOS, Windows, Linux).
-
-Offers tools to add and execute code or markdown cells in notebooks programmatically.
-
-Getting Started
-Prerequisites
-
-Make sure you have the following installed:
-
-JupyterLab (version 4.4.1)
-
-jupyter-collaboration (version 4.0.2)
-
-ipykernel
-
-datalayer_pycrdt (version 0.12.15)
-
-Install with:
-
-bash
 pip install jupyterlab==4.4.1 jupyter-collaboration==4.0.2 ipykernel
 pip uninstall -y pycrdt datalayer_pycrdt
 pip install datalayer_pycrdt==0.12.15
-Starting JupyterLab
+Then, start JupyterLab with the following command.
 
-Start JupyterLab with:
-
-bash
 jupyter lab --port 8888 --IdentityProvider.token MY_TOKEN --ip 0.0.0.0
-Or use:
+You can also run make jupyterlab.
 
-bash
-make jupyterlab
-The --ip 0.0.0.0 option allows the MCP server running in Docker to access your local JupyterLab.
+Note
 
-Integration with Claude Desktop
-Claude Desktop is available for macOS and Windows. For Linux, you can use an unofficial build script based on Nix.
+The --ip is set to 0.0.0.0 to allow the MCP server running in a Docker container to access your local JupyterLab.
 
-Claude Desktop Configuration Example (macOS/Windows):
+Use with Claude Desktop
+Claude Desktop can be downloaded from this page for macOS and Windows.
 
-json
+For Linux, we had success using this UNOFFICIAL build script based on nix
+
+# ⚠️ UNOFFICIAL
+# You can also run `make claude-linux`
+NIXPKGS_ALLOW_UNFREE=1 nix run github:k3d3/claude-desktop-linux-flake \
+  --impure \
+  --extra-experimental-features flakes \
+  --extra-experimental-features nix-command
+To use this with Claude Desktop, add the following to your claude_desktop_config.json (read more on the MCP documentation website).
+
+Important
+
+Ensure the port of the SERVER_URLand TOKEN match those used in the jupyter lab command.
+
+The NOTEBOOK_PATH should be relative to the directory where JupyterLab was started.
+
+Claude Configuration on macOS and Windows
 {
   "mcpServers": {
     "jupyter": {
       "command": "docker",
       "args": [
-        "run", "-i", "--rm", "-e", "SERVER_URL", "-e", "TOKEN", "-e", "NOTEBOOK_PATH",
+        "run",
+        "-i",
+        "--rm",
+        "-e",
+        "SERVER_URL",
+        "-e",
+        "TOKEN",
+        "-e",
+        "NOTEBOOK_PATH",
         "datalayer/jupyter-mcp-server:latest"
       ],
       "env": {
@@ -64,15 +60,24 @@ json
     }
   }
 }
-Claude Desktop Configuration Example (Linux):
-
-json
+Claude Configuration on Linux
+CLAUDE_CONFIG=${HOME}/.config/Claude/claude_desktop_config.json
+cat <<EOF > $CLAUDE_CONFIG
 {
   "mcpServers": {
     "jupyter": {
       "command": "docker",
       "args": [
-        "run", "-i", "--rm", "-e", "SERVER_URL", "-e", "TOKEN", "-e", "NOTEBOOK_PATH", "--network=host",
+        "run",
+        "-i",
+        "--rm",
+        "-e",
+        "SERVER_URL",
+        "-e",
+        "TOKEN",
+        "-e",
+        "NOTEBOOK_PATH",
+        "--network=host",
         "datalayer/jupyter-mcp-server:latest"
       ],
       "env": {
@@ -83,25 +88,30 @@ json
     }
   }
 }
-Ensure the SERVER_URL and TOKEN match those used when starting JupyterLab. The NOTEBOOK_PATH should be relative to the directory where JupyterLab was started.
-
+EOF
+cat $CLAUDE_CONFIG
+Components
 Tools
-The server currently provides two main tools:
+The server currently offers 2 tools:
 
-Tool	Description	Input Parameter	Output
-add_execute_code_cell	Add and execute a code cell in a notebook	cell_content (string)	Cell output
-add_markdown_cell	Add a markdown cell in a notebook	cell_content (string)	Success message
-Building the Docker Image
-To build the Docker image from source:
+add_execute_code_cell
+Add and execute a code cell in a Jupyter notebook.
+Input:
+cell_content(string): Code to be executed.
+Returns: Cell output.
+add_markdown_cell
+Add a markdown cell in a Jupyter notebook.
+Input:
+cell_content(string): Markdown content.
+Returns: Success message.
+Building
+You can build the Docker image it from source.
 
-bash
 make build-docker
-Installation via Smithery
-To install Jupyter MCP Server for Claude Desktop automatically:
+Installing via Smithery
+To install Jupyter MCP Server for Claude Desktop automatically via Smithery:
 
-bash
 npx -y @smithery/cli install @datalayer/jupyter-mcp-server --client claude
-License
-See the repository for license details.
+
 
 For more information, refer to the official documentation and the MCP documentation website
